@@ -2,13 +2,6 @@ name: VibeList Daily Digest
 
 on:
   workflow_dispatch:
-    inputs:
-      test_mode:
-        description: "Run in test mode (no email sent)"
-        default: "false"
-      log_level:
-        description: "Log level"
-        default: "INFO"
   schedule:
     # Run daily at 4:30 PM EST (9:30 PM UTC) - after market close
     - cron: "30 21 * * 1-5"  # Monday-Friday at 9:30 PM UTC
@@ -94,15 +87,15 @@ PY
         FROM_EMAIL=${{ secrets.FROM_EMAIL }}
         TO_EMAIL=${{ secrets.TO_EMAIL }}
         PORTFOLIO_CONFIG_PATH=config.json
-        LOG_LEVEL=${{ github.event.inputs.log_level || 'INFO' }}
+        LOG_LEVEL=INFO
         EOF
 
     - name: Run daily digest
       run: |
         if [[ "${{ github.event.inputs.test_mode }}" == "true" ]]; then
-          python main.py --dry-run --config config.json --log-level "${{ github.event.inputs.log_level || 'INFO' }}"
+          python main.py --dry-run --config config.json --log-level INFO
         else
-          python main.py --config config.json --log-level "${{ github.event.inputs.log_level || 'INFO' }}"
+          python main.py --config config.json --log-level INFO
         fi
 
     - name: Upload logs
