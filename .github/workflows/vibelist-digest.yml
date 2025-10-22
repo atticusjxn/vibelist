@@ -2,6 +2,8 @@ name: VibeList Daily Digest
 
 on:
   workflow_dispatch:
+  repository_dispatch:
+    types: [manual-trigger]
   schedule:
     # Run daily at 4:30 PM EST (9:30 PM UTC) - after market close
     - cron: "30 21 * * 1-5"  # Monday-Friday at 9:30 PM UTC
@@ -87,15 +89,17 @@ PY
         FROM_EMAIL=${{ secrets.FROM_EMAIL }}
         TO_EMAIL=${{ secrets.TO_EMAIL }}
         PORTFOLIO_CONFIG_PATH=config.json
-        LOG_LEVEL=INFO
+        LOG_LEVEL=${{ github.event.inputs.log_level || github.event.client_payload.log_level || 'INFO' }}
         EOF
 
     - name: Run daily digest
       run: |
-        if [[ "${{ github.event.inputs.test_mode }}" == "true" ]]; then
-          python main.py --dry-run --config config.json --log-level INFO
+        TEST_MODE="${{ github.event.inputs.test_mode || github.event.client_payload.test_mode || 'false' }}"
+        LOG_LEVEL="${{ github.event.inputs.log_level || github.event.client_payload.log_level || 'INFO' }}"
+        if [[ "$TEST_MODE" == "true" ]]; then
+          python main.py --dry-run --config config.json --log-level "$LOG_LEVEL"
         else
-          python main.py --config config.json --log-level INFO
+          python main.py --config config.json --log-level "$LOG_LEVEL"
         fi
 
     - name: Upload logs
@@ -107,7 +111,7 @@ PY
         retention-days: 30
 
     - name: Upload test email (if dry run)
-      if: github.event.inputs.test_mode == 'true'
+      if: ${{ github.event.inputs.test_mode == 'true' || github.event.client_payload.test_mode == 'true' }}
       uses: actions/upload-artifact@v4
       with:
         name: test-email-${{ github.run_number }}
