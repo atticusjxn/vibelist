@@ -1,0 +1,10 @@
+name: Manual Sanity Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "sanity ok"
