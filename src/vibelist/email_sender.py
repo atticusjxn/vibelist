@@ -88,15 +88,17 @@ class EmailSender:
         try:
             logger.info("Sending test email")
 
-            html_content = """
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+
+            html_content = f"""
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
                 <title>VibeList Test</title>
                 <style>
-                    body { font-family: monospace; background: #000; color: #0f0; padding: 20px; }
-                    .container { max-width: 600px; margin: 0 auto; border: 2px solid #0f0; padding: 20px; }
+                    body {{ font-family: monospace; background: #000; color: #0f0; padding: 20px; }}
+                    .container {{ max-width: 600px; margin: 0 auto; border: 2px solid #0f0; padding: 20px; }}
                 </style>
             </head>
             <body>
@@ -104,13 +106,13 @@ class EmailSender:
                     <h1>VIBELIST SYSTEM TEST</h1>
                     <p>This is a test email from VibeList.</p>
                     <p>If you're receiving this, your email configuration is working correctly!</p>
-                    <p>System Time: {}</p>
+                    <p>System Time: {timestamp}</p>
                     <hr>
                     <p><em>VibeList v1.0 - Daily Portfolio Digest</em></p>
                 </div>
             </body>
             </html>
-            """.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"))
+            """
 
             text_content = f"""
 VIBELIST SYSTEM TEST
@@ -119,7 +121,7 @@ This is a test email from VibeList.
 
 If you're receiving this, your email configuration is working correctly!
 
-System Time: {datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")}
+System Time: {timestamp}
 
 ---
 VibeList v1.0 - Daily Portfolio Digest
