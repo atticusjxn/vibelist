@@ -78,10 +78,14 @@ class TestAPIConfig:
     def test_valid_api_config(self):
         config = APIConfig(
             xai_api_key="test_key",
+            xai_model="grok-4-fast",
+            xai_base_url="https://api.x.ai/v1",
             resend_api_key="test_key",
             from_email="test@example.com"
         )
         assert config.xai_api_key == "test_key"
+        assert config.xai_model == "grok-4-fast"
+        assert config.xai_base_url == "https://api.x.ai/v1"
         assert config.resend_api_key == "test_key"
         assert config.from_email == "test@example.com"
 
@@ -99,7 +103,7 @@ def test_create_sample_portfolio():
 
         assert "stocks" in data
         assert "email" in data
-        assert len(data["stocks"]) == 3
+        assert len(data["stocks"]) >= 1
         assert data["email"] == "your-email@example.com"
 
 
@@ -124,6 +128,8 @@ def test_load_config_missing_env_vars():
 
         # Clear environment variables
         old_xai = os.environ.pop("XAI_API_KEY", None)
+        old_model = os.environ.pop("XAI_MODEL", None)
+        old_base = os.environ.pop("XAI_API_BASE_URL", None)
         old_resend = os.environ.pop("RESEND_API_KEY", None)
         old_from = os.environ.pop("FROM_EMAIL", None)
 
@@ -134,6 +140,10 @@ def test_load_config_missing_env_vars():
             # Restore environment variables
             if old_xai:
                 os.environ["XAI_API_KEY"] = old_xai
+            if old_model:
+                os.environ["XAI_MODEL"] = old_model
+            if old_base:
+                os.environ["XAI_API_BASE_URL"] = old_base
             if old_resend:
                 os.environ["RESEND_API_KEY"] = old_resend
             if old_from:

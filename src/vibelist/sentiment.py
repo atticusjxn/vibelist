@@ -2,12 +2,14 @@
 X sentiment analysis using the xAI API (Grok)
 """
 
-import requests
 import json
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
-from pydantic import BaseModel
 import logging
+import os
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+import requests
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +29,20 @@ class SentimentScore(BaseModel):
 class XaiAPIClient:
     """Client for interacting with the xAI API (Grok) for X sentiment analysis"""
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, model: Optional[str] = None, base_url: Optional[str] = None):
         self.api_key = api_key
-        self.base_url = "https://api.x.ai/v1"  # Placeholder - actual xAI endpoint may differ
+        self.model = model or os.getenv("XAI_MODEL", "grok-4-fast")
+        self.base_url = base_url or os.getenv("XAI_API_BASE_URL", "https://api.x.ai/v1")
         self.headers = {
             "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Accept": "application/json",
         }
+        self.system_prompt = (
+            "You are Grok 4 Fast Reasoning assisting with financial sentiment analysis. "
+            "Summarize recent X/Twitter sentiment for the requested stock and respond strictly "
+            "with a JSON object matching the provided schema."
+        )
 
     def analyze_stock_sentiment(self, symbol: str, hours_back: int = 24) -> SentimentScore:
         """
@@ -114,30 +123,42 @@ class XaiAPIClient:
         """Make API call to xAI"""
 
         try:
-            # Note: This is a placeholder implementation
-            # The actual xAI API endpoint and parameters may differ
             payload = {
-                "model": "grok-beta",  # Placeholder model name
+                "model": self.model,
                 "messages": [
                     {
+                        "role": "system",
+                        "content": self.system_prompt,
+                    },
+                    {
                         "role": "user",
-                        "content": prompt
-                    }
+                        "content": prompt.strip(),
+                    },
                 ],
-                "temperature": 0.3,  # Lower temperature for more consistent analysis
-                "max_tokens": 1000
+                "temperature": 0.2,
+                "max_tokens": 900,
+                "response_format": {"type": "json_object"},
             }
 
             response = requests.post(
-                f"{self.base_url}/chat/completions",
+                f"{self.base_url.rstrip('/')}/chat/completions",
                 headers=self.headers,
                 json=payload,
-                timeout=30
+                timeout=45,
             )
 
             response.raise_for_status()
             return response.json()
 
+        except requests.exceptions.HTTPError as e:
+            status = e.response.status_code if e.response is not None else "unknown"
+            logger.error(
+                "xAI API request failed with status %s: %s. Verify your Grok model access, "
+                "API base URL, and that the `grok-4-fast` model identifier is correct.",
+                status,
+                e,
+            )
+            raise
         except requests.exceptions.RequestException as e:
             logger.error(f"xAI API request failed: {str(e)}")
             raise
@@ -149,9 +170,31 @@ class XaiAPIClient:
         """Parse xAI API response into SentimentScore"""
 
         try:
+            content = ""
             # Extract the content from the response
             if "choices" in response and len(response["choices"]) > 0:
-                content = response["choices"][0]["message"]["content"]
+                message = response["choices"][0]["message"]
+                content = message.get("content", "")
+
+                if isinstance(content, list):
+                    text_chunks = [
+                        chunk.get("text", "")
+                        for chunk in content
+                        if isinstance(chunk, dict) and chunk.get("type") == "text"
+                    ]
+                    content = "\n".join(filter(None, text_chunks))
+
+                if not content and message.get("tool_calls"):
+                    # Fall back to function-call arguments if present
+                    for tool_call in message["tool_calls"]:
+                        arguments = (
+                            tool_call.get("function", {}).get("arguments")
+                            if isinstance(tool_call, dict)
+                            else None
+                        )
+                        if arguments:
+                            content = arguments
+                            break
             else:
                 raise ValueError("Unexpected response format from xAI API")
 

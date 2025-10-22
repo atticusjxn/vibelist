@@ -55,6 +55,8 @@ class PortfolioConfig(BaseModel):
 class APIConfig(BaseModel):
     """API configuration"""
     xai_api_key: str = Field(..., description="xAI API key")
+    xai_model: str = Field(default="grok-4-fast", description="xAI model identifier")
+    xai_base_url: str = Field(default="https://api.x.ai/v1", description="xAI API base URL")
     resend_api_key: str = Field(..., description="Resend API key")
     from_email: str = Field(..., description="From email address")
 
@@ -87,6 +89,8 @@ def load_config(portfolio_path: Optional[str] = None) -> VibeListConfig:
     # Create API config
     api_config = APIConfig(
         xai_api_key=os.getenv("XAI_API_KEY", ""),
+        xai_model=os.getenv("XAI_MODEL", "grok-4-fast"),
+        xai_base_url=os.getenv("XAI_API_BASE_URL", "https://api.x.ai/v1"),
         resend_api_key=os.getenv("RESEND_API_KEY", ""),
         from_email=os.getenv("FROM_EMAIL", "")
     )

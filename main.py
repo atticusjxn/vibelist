@@ -314,7 +314,11 @@ def generate_daily_digest(config_path: Optional[str] = None, test_mode: bool = F
 
         # Initialize components
         stock_fetcher = StockDataFetcher()
-        xai_client = XaiAPIClient(config.api.xai_api_key)
+        xai_client = XaiAPIClient(
+            config.api.xai_api_key,
+            model=config.api.xai_model,
+            base_url=config.api.xai_base_url,
+        )
         recommendation_engine = RecommendationEngine()
         email_generator = EmailGenerator()
         email_sender = EmailSender(config.api.resend_api_key, config.api.from_email)

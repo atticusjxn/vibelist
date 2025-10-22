@@ -5,7 +5,7 @@ A simple, single-user Python script that sends you a daily email digest summariz
 ## Features
 
 - **Daily Portfolio Digest**: Automated email with portfolio performance and X sentiment analysis
-- **Real-time Sentiment Analysis**: Uses the xAI API (Grok) to analyze X/Twitter posts about your stocks
+- **Real-time Sentiment Analysis**: Uses Grok 4 Fast via the xAI API to analyze X/Twitter posts about your stocks
 - **Retro 80s Terminal UI**: Cool terminal-style email design with CRT monitor effects
 - **Buy/Sell/Hold Recommendations**: AI-powered recommendations based on sentiment and price data
 - **Portfolio Weighted Analysis**: Recommendations based on your actual portfolio allocation
@@ -56,10 +56,12 @@ cp .env.example .env
 Edit `.env` with your keys:
 ```
 XAI_API_KEY=your_xai_api_key_here
+XAI_MODEL=grok-4-fast
 RESEND_API_KEY=your_resend_api_key_here
 FROM_EMAIL=noreply@yourdomain.com
 TO_EMAIL=your_email@example.com
 ```
+Optionally set `XAI_API_BASE_URL` if you are pointed at a different Grok endpoint.
 
 ### 5. Test Configuration
 
@@ -84,6 +86,7 @@ python main.py
 1. Get access to xAI API (Grok) at https://x.ai/
 2. Generate an API key
 3. Add it to your `.env` file
+4. (Optional) Set `XAI_MODEL` to the Grok model you want to use, e.g. `grok-4-fast`
 
 ### Resend API (for Email)
 1. Sign up at https://resend.com/
@@ -102,11 +105,15 @@ No setup required - uses free public API!
 2. Go to Settings → Secrets and variables → Actions
 3. Add these repository secrets:
    - `XAI_API_KEY`: Your xAI API (Grok) key
+   - `XAI_MODEL`: (Optional) Override the Grok model, defaults to `grok-4-fast`
+   - `XAI_API_BASE_URL`: (Optional) Override the xAI API base URL
    - `RESEND_API_KEY`: Your Resend API key
    - `FROM_EMAIL`: Your verified email address
    - `TO_EMAIL`: Your recipient email
+   - `PORTFOLIO_JSON`: (Optional) Full JSON payload for `config/portfolio.json`
 
 The daily digest will run automatically at 4:30 PM EST on weekdays.
+If `PORTFOLIO_JSON` is not provided, the workflow falls back to a sample portfolio—update the secret to match your real holdings.
 
 ### Option 2: Local Cron Job
 

@@ -51,23 +51,54 @@ jobs:
     - name: Create config directory
       run: mkdir -p config logs
 
+    - name: Validate required secrets
+      run: |
+        missing=()
+        [[ -z "${{ secrets.XAI_API_KEY }}" ]] && missing+=("XAI_API_KEY")
+        [[ -z "${{ secrets.RESEND_API_KEY }}" ]] && missing+=("RESEND_API_KEY")
+        [[ -z "${{ secrets.FROM_EMAIL }}" ]] && missing+=("FROM_EMAIL")
+        [[ -z "${{ secrets.TO_EMAIL }}" ]] && missing+=("TO_EMAIL")
+        if [ ${#missing[@]} -gt 0 ]; then
+          printf '::error::Missing required secrets: %s\n' "${missing[*]}"
+          exit 1
+        fi
+
     - name: Create portfolio configuration
       run: |
-        cat > config/portfolio.json << EOF
-        {
-          "stocks": [
-            {"symbol": "AAPL", "weight": 0.4},
-            {"symbol": "TSLA", "weight": 0.3},
-            {"symbol": "NVDA", "weight": 0.3}
-          ],
-          "email": "${{ secrets.TO_EMAIL }}"
-        }
-        EOF
+        if [ -n "${{ secrets.PORTFOLIO_JSON }}" ]; then
+          printf '%s\n' "${{ secrets.PORTFOLIO_JSON }}" > config/portfolio.json
+        else
+          cat > config/portfolio.json << 'EOF'
+{
+  "stocks": [
+    {"symbol": "AAPL", "weight": 0.4},
+    {"symbol": "TSLA", "weight": 0.3},
+    {"symbol": "NVDA", "weight": 0.3}
+  ],
+  "email": ""
+}
+EOF
+        fi
+
+        # Ensure the portfolio email matches the deployment target
+        python - <<'PY'
+import json
+from pathlib import Path
+
+config_path = Path("config/portfolio.json")
+data = json.loads(config_path.read_text())
+email = "${{ secrets.TO_EMAIL }}"
+if email:
+    data["email"] = email
+config_path.write_text(json.dumps(data, indent=2))
+PY
 
     - name: Create environment file
       run: |
         cat > .env << EOF
         XAI_API_KEY=${{ secrets.XAI_API_KEY }}
+        XAI_MODEL=${{ secrets.XAI_MODEL != '' && secrets.XAI_MODEL || 'grok-4-fast' }}
+        XAI_API_BASE_URL=${{ secrets.XAI_API_BASE_URL != '' && secrets.XAI_API_BASE_URL || 'https://api.x.ai/v1' }}
         RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
         FROM_EMAIL=${{ secrets.FROM_EMAIL }}
         TO_EMAIL=${{ secrets.TO_EMAIL }}
