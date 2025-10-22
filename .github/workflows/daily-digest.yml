@@ -85,7 +85,7 @@ jobs:
 
     - name: Upload logs
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: digest-logs-${{ github.run_number }}
         path: logs/
@@ -93,7 +93,7 @@ jobs:
 
     - name: Upload test email (if dry run)
       if: github.event.inputs.test_mode == 'true'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-email-${{ github.run_number }}
         path: logs/test_digest_*.html
