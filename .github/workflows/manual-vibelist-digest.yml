@@ -1,0 +1,89 @@
+name: Manual VibeList Digest
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: "Run in test mode (no email sent)"
+        default: "false"
+      log_level:
+        description: "Log level"
+        default: "INFO"
+
+jobs:
+  manual-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create logs directory
+        run: mkdir -p logs
+
+      - name: Write portfolio configuration
+        run: |
+          if [ -n "${{ secrets.PORTFOLIO_JSON }}" ]; then
+            printf '%s\n' "${{ secrets.PORTFOLIO_JSON }}" > config.json
+          else
+            cat > config.json <<'EOF'
+{
+  "stocks": [
+    {"symbol": "AAPL", "weight": 0.4},
+    {"symbol": "TSLA", "weight": 0.3},
+    {"symbol": "NVDA", "weight": 0.3}
+  ],
+  "email": ""
+}
+EOF
+          fi
+
+          python - <<'PY'
+import json
+from pathlib import Path
+
+config_path = Path("config.json")
+data = json.loads(config_path.read_text())
+email = "${{ secrets.TO_EMAIL }}"
+if email:
+    data["email"] = email
+config_path.write_text(json.dumps(data, indent=2))
+PY
+
+      - name: Create environment file
+        run: |
+          cat > .env << EOF
+          XAI_API_KEY=${{ secrets.XAI_API_KEY }}
+          XAI_MODEL=${{ secrets.XAI_MODEL != '' && secrets.XAI_MODEL || 'grok-4-fast' }}
+          XAI_API_BASE_URL=${{ secrets.XAI_API_BASE_URL != '' && secrets.XAI_API_BASE_URL || 'https://api.x.ai/v1' }}
+          RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+          FROM_EMAIL=${{ secrets.FROM_EMAIL }}
+          TO_EMAIL=${{ secrets.TO_EMAIL }}
+          PORTFOLIO_CONFIG_PATH=config.json
+          LOG_LEVEL=${{ github.event.inputs.log_level }}
+          EOF
+
+      - name: Run digest
+        run: |
+          if [[ "${{ github.event.inputs.test_mode }}" == "true" ]]; then
+            python main.py --dry-run --config config.json --log-level "${{ github.event.inputs.log_level }}"
+          else
+            python main.py --config config.json --log-level "${{ github.event.inputs.log_level }}"
+          fi
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-digest-logs-${{ github.run_number }}
+          path: logs/
+          retention-days: 14
