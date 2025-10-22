@@ -2,6 +2,25 @@ name: Manual VibeList Digest
 
 on:
   workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Run in test mode (dry run)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+      log_level:
+        description: 'Log level'
+        required: false
+        default: 'INFO'
+        type: choice
+        options:
+        - 'DEBUG'
+        - 'INFO'
+        - 'WARNING'
+        - 'ERROR'
 
 jobs:
   manual-digest:
@@ -62,12 +81,18 @@ PY
           FROM_EMAIL=${{ secrets.FROM_EMAIL }}
           TO_EMAIL=${{ secrets.TO_EMAIL }}
           PORTFOLIO_CONFIG_PATH=config.json
-          LOG_LEVEL=INFO
+          LOG_LEVEL=${{ github.event.inputs.log_level || 'INFO' }}
           EOF
 
       - name: Run digest
         run: |
-          python main.py --config config.json --log-level INFO
+          TEST_MODE="${{ github.event.inputs.test_mode || 'false' }}"
+          LOG_LEVEL="${{ github.event.inputs.log_level || 'INFO' }}"
+          if [[ "$TEST_MODE" == "true" ]]; then
+            python main.py --dry-run --config config.json --log-level "$LOG_LEVEL"
+          else
+            python main.py --config config.json --log-level "$LOG_LEVEL"
+          fi
 
       - name: Upload logs
         if: always()
