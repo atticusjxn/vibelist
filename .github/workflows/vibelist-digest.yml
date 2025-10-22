@@ -1,16 +1,14 @@
 name: VibeList Daily Digest
 
 on:
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch:
     inputs:
       test_mode:
-        description: Run in test mode (no email sent)
+        description: "Run in test mode (no email sent)"
         default: "false"
-        required: false
       log_level:
-        description: Log level
+        description: "Log level"
         default: "INFO"
-        required: false
   schedule:
     # Run daily at 4:30 PM EST (9:30 PM UTC) - after market close
     - cron: "30 21 * * 1-5"  # Monday-Friday at 9:30 PM UTC
