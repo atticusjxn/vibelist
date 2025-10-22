@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from vibelist.config import load_config
 from vibelist.stock_data import StockDataFetcher
-from vibelist.sentiment import GrokAPIClient
+from vibelist.sentiment import XaiAPIClient
 from vibelist.analyzer import RecommendationEngine
 from vibelist.email_generator import EmailGenerator
 from vibelist.email_sender import EmailSender
@@ -314,7 +314,7 @@ def generate_daily_digest(config_path: Optional[str] = None, test_mode: bool = F
 
         # Initialize components
         stock_fetcher = StockDataFetcher()
-        grok_client = GrokAPIClient(config.api.grok_api_key)
+        xai_client = XaiAPIClient(config.api.xai_api_key)
         recommendation_engine = RecommendationEngine()
         email_generator = EmailGenerator()
         email_sender = EmailSender(config.api.resend_api_key, config.api.from_email)
@@ -337,7 +337,7 @@ def generate_daily_digest(config_path: Optional[str] = None, test_mode: bool = F
 
         # Analyze sentiment
         logger.info("Analyzing X sentiment...")
-        sentiment_data = grok_client.batch_analyze(stock_symbols)
+        sentiment_data = xai_client.batch_analyze(stock_symbols)
 
         if not sentiment_data:
             raise ValueError("No sentiment data could be analyzed")

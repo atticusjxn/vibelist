@@ -1,5 +1,5 @@
 """
-X sentiment analysis using Grok API
+X sentiment analysis using the xAI API (Grok)
 """
 
 import requests
@@ -24,12 +24,12 @@ class SentimentScore(BaseModel):
     sources: List[str]
 
 
-class GrokAPIClient:
-    """Client for interacting with Grok API for X sentiment analysis"""
+class XaiAPIClient:
+    """Client for interacting with the xAI API (Grok) for X sentiment analysis"""
 
     def __init__(self, api_key: str):
         self.api_key = api_key
-        self.base_url = "https://api.x.ai/v1"  # This is a placeholder - actual Grok API endpoint may differ
+        self.base_url = "https://api.x.ai/v1"  # Placeholder - actual xAI endpoint may differ
         self.headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
@@ -50,14 +50,14 @@ class GrokAPIClient:
             symbol = symbol.upper().strip()
             logger.info(f"Analyzing X sentiment for {symbol} over last {hours_back} hours")
 
-            # Construct the prompt for Grok
+            # Construct the prompt for xAI
             prompt = self._build_sentiment_prompt(symbol, hours_back)
 
-            # Make API call to Grok
-            response = self._call_grok_api(prompt)
+            # Make API call to xAI
+            response = self._call_xai_api(prompt)
 
             # Parse and structure the response
-            sentiment_score = self._parse_grok_response(response, symbol)
+            sentiment_score = self._parse_xai_response(response, symbol)
 
             logger.info(f"Sentiment analysis complete for {symbol}: {sentiment_score.sentiment_label} ({sentiment_score.overall_sentiment:+.2f})")
             return sentiment_score
@@ -77,7 +77,7 @@ class GrokAPIClient:
             )
 
     def _build_sentiment_prompt(self, symbol: str, hours_back: int) -> str:
-        """Build the prompt for Grok API"""
+        """Build the prompt for the xAI API"""
 
         cutoff_time = datetime.now() - timedelta(hours=hours_back)
         time_str = cutoff_time.strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -110,12 +110,12 @@ class GrokAPIClient:
 
         return prompt
 
-    def _call_grok_api(self, prompt: str) -> Dict[str, Any]:
-        """Make API call to Grok"""
+    def _call_xai_api(self, prompt: str) -> Dict[str, Any]:
+        """Make API call to xAI"""
 
         try:
             # Note: This is a placeholder implementation
-            # The actual Grok API endpoint and parameters may differ
+            # The actual xAI API endpoint and parameters may differ
             payload = {
                 "model": "grok-beta",  # Placeholder model name
                 "messages": [
@@ -139,21 +139,21 @@ class GrokAPIClient:
             return response.json()
 
         except requests.exceptions.RequestException as e:
-            logger.error(f"Grok API request failed: {str(e)}")
+            logger.error(f"xAI API request failed: {str(e)}")
             raise
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to decode Grok API response: {str(e)}")
+            logger.error(f"Failed to decode xAI API response: {str(e)}")
             raise
 
-    def _parse_grok_response(self, response: Dict[str, Any], symbol: str) -> SentimentScore:
-        """Parse Grok API response into SentimentScore"""
+    def _parse_xai_response(self, response: Dict[str, Any], symbol: str) -> SentimentScore:
+        """Parse xAI API response into SentimentScore"""
 
         try:
             # Extract the content from the response
             if "choices" in response and len(response["choices"]) > 0:
                 content = response["choices"][0]["message"]["content"]
             else:
-                raise ValueError("Unexpected response format from Grok API")
+                raise ValueError("Unexpected response format from xAI API")
 
             # Try to parse JSON from the content
             # The response might contain markdown code blocks
@@ -182,7 +182,7 @@ class GrokAPIClient:
             )
 
         except (json.JSONDecodeError, KeyError, ValueError) as e:
-            logger.error(f"Failed to parse Grok response for {symbol}: {str(e)}")
+            logger.error(f"Failed to parse xAI response for {symbol}: {str(e)}")
             logger.debug(f"Raw response: {content if 'content' in locals() else response}")
 
             # Return neutral sentiment on parsing error

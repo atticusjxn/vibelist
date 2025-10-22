@@ -20,7 +20,7 @@ Run `pip install -r requirements.txt` to sync both runtime and dev dependencies.
 Follow Black’s default 88-character line width and 4-space indentation. Modules and functions stay snake_case, classes use PascalCase, constants are SCREAMING_SNAKE_CASE, and environment variables live in `.env`. Keep Jinja templates HTML-first and avoid embedding application logic there.
 
 ## Testing Guidelines
-Tests belong in `tests/` with files named `test_<module>.py` and functions prefixed `test_`. Use pytest fixtures for API stubs and sample portfolios, and add coverage for Grok and Resend integrations via mocked responses. Ensure `pytest ... --cov=src` remains green before opening a pull request.
+Tests belong in `tests/` with files named `test_<module>.py` and functions prefixed `test_`. Use pytest fixtures for API stubs and sample portfolios, and add coverage for xAI (Grok) and Resend integrations via mocked responses. Ensure `pytest ... --cov=src` remains green before opening a pull request.
 
 ## Commit & Pull Request Guidelines
 With no shared history in this snapshot, default to a conventional, imperative subject line (`type: short summary`) and add focused body bullets when context helps reviewers. Reference issue IDs in the footer (`Refs #123`) and squash fixups locally. Pull requests must describe the change, list validation commands run, and attach screenshots or sample email snippets when UI-facing output changes.

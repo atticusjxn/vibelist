@@ -77,11 +77,11 @@ class TestAPIConfig:
 
     def test_valid_api_config(self):
         config = APIConfig(
-            grok_api_key="test_key",
+            xai_api_key="test_key",
             resend_api_key="test_key",
             from_email="test@example.com"
         )
-        assert config.grok_api_key == "test_key"
+        assert config.xai_api_key == "test_key"
         assert config.resend_api_key == "test_key"
         assert config.from_email == "test@example.com"
 
@@ -123,17 +123,17 @@ def test_load_config_missing_env_vars():
             json.dump(portfolio_data, f)
 
         # Clear environment variables
-        old_grok = os.environ.pop("GROK_API_KEY", None)
+        old_xai = os.environ.pop("XAI_API_KEY", None)
         old_resend = os.environ.pop("RESEND_API_KEY", None)
         old_from = os.environ.pop("FROM_EMAIL", None)
 
         try:
-            with pytest.raises(ValueError, match="GROK_API_KEY"):
+            with pytest.raises(ValueError, match="XAI_API_KEY"):
                 load_config(config_path)
         finally:
             # Restore environment variables
-            if old_grok:
-                os.environ["GROK_API_KEY"] = old_grok
+            if old_xai:
+                os.environ["XAI_API_KEY"] = old_xai
             if old_resend:
                 os.environ["RESEND_API_KEY"] = old_resend
             if old_from:

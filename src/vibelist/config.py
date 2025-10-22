@@ -54,7 +54,7 @@ class PortfolioConfig(BaseModel):
 
 class APIConfig(BaseModel):
     """API configuration"""
-    grok_api_key: str = Field(..., description="Grok API key")
+    xai_api_key: str = Field(..., description="xAI API key")
     resend_api_key: str = Field(..., description="Resend API key")
     from_email: str = Field(..., description="From email address")
 
@@ -86,14 +86,14 @@ def load_config(portfolio_path: Optional[str] = None) -> VibeListConfig:
 
     # Create API config
     api_config = APIConfig(
-        grok_api_key=os.getenv("GROK_API_KEY", ""),
+        xai_api_key=os.getenv("XAI_API_KEY", ""),
         resend_api_key=os.getenv("RESEND_API_KEY", ""),
         from_email=os.getenv("FROM_EMAIL", "")
     )
 
     # Validate API keys
-    if not api_config.grok_api_key:
-        raise ValueError("GROK_API_KEY environment variable is required")
+    if not api_config.xai_api_key:
+        raise ValueError("XAI_API_KEY environment variable is required")
     if not api_config.resend_api_key:
         raise ValueError("RESEND_API_KEY environment variable is required")
     if not api_config.from_email:
