@@ -32,7 +32,7 @@ pip install -r requirements.txt
 python main.py --create-sample
 ```
 
-This creates `config/portfolio.json` - edit it with your stocks and email:
+This creates `config.json` - edit it with your stocks and email:
 
 ```json
 {
@@ -110,7 +110,7 @@ No setup required - uses free public API!
    - `RESEND_API_KEY`: Your Resend API key
    - `FROM_EMAIL`: Your verified email address
    - `TO_EMAIL`: Your recipient email
-   - `PORTFOLIO_JSON`: (Optional) Full JSON payload for `config/portfolio.json`
+   - `PORTFOLIO_JSON`: (Optional) Full JSON payload for `config.json`
 
 The daily digest will run automatically at 4:30 PM EST on weekdays.
 If `PORTFOLIO_JSON` is not provided, the workflow falls back to a sample portfolio—update the secret to match your real holdings.
@@ -149,7 +149,7 @@ Options:
 
 ## Portfolio Configuration
 
-Your `config/portfolio.json` should look like this:
+Your `config.json` should look like this:
 
 ```json
 {
@@ -225,7 +225,7 @@ vibelist/
 
 **1. "Portfolio configuration file not found"**
 - Run `python main.py --create-sample` first
-- Make sure `config/portfolio.json` exists
+- Make sure `config.json` exists
 
 **2. "XAI_API_KEY environment variable is required"**
 - Add your xAI API (Grok) key to `.env` file

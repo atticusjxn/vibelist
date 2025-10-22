@@ -66,7 +66,7 @@ class VibeListConfig(BaseModel):
     portfolio: PortfolioConfig
     api: APIConfig
     log_level: str = Field(default="INFO", description="Logging level")
-    portfolio_config_path: str = Field(default="config/portfolio.json", description="Path to portfolio config file")
+    portfolio_config_path: str = Field(default="config.json", description="Path to portfolio config file")
 
 
 def load_config(portfolio_path: Optional[str] = None) -> VibeListConfig:
@@ -74,7 +74,7 @@ def load_config(portfolio_path: Optional[str] = None) -> VibeListConfig:
 
     # Load portfolio configuration
     if portfolio_path is None:
-        portfolio_path = os.getenv("PORTFOLIO_CONFIG_PATH", "config/portfolio.json")
+        portfolio_path = os.getenv("PORTFOLIO_CONFIG_PATH", "config.json")
 
     portfolio_file = Path(portfolio_path)
     if not portfolio_file.exists():
@@ -114,7 +114,7 @@ def load_config(portfolio_path: Optional[str] = None) -> VibeListConfig:
     return config
 
 
-def create_sample_portfolio(output_path: str = "config/portfolio.json"):
+def create_sample_portfolio(output_path: str = "config.json"):
     """Create a sample portfolio configuration file"""
 
     sample_portfolio = {
@@ -137,7 +137,7 @@ def create_sample_portfolio(output_path: str = "config/portfolio.json"):
 
     # Create config directory if it doesn't exist
     config_dir = Path(output_path).parent
-    config_dir.mkdir(exist_ok=True)
+    config_dir.mkdir(parents=True, exist_ok=True)
 
     # Write sample portfolio
     with open(output_path, 'w') as f:

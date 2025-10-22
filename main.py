@@ -198,7 +198,7 @@ def create_personal_portfolio_config(
     Create a portfolio config file using holdings from PERSONAL_PORTFOLIO_HOLDINGS.
 
     Args:
-        output_path: Optional path to write config (defaults to env or config/portfolio.json)
+        output_path: Optional path to write config (defaults to env or config.json)
         email: Optional override for destination email address
 
     Returns:
@@ -223,7 +223,7 @@ def create_personal_portfolio_config(
     portfolio_config = {"stocks": stocks, "email": portfolio_email}
 
     if output_path is None:
-        output_path = os.getenv("PORTFOLIO_CONFIG_PATH", "config/portfolio.json")
+        output_path = os.getenv("PORTFOLIO_CONFIG_PATH", "config.json")
 
     output_file = Path(output_path)
     output_file.parent.mkdir(parents=True, exist_ok=True)

@@ -48,8 +48,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Create config directory
-      run: mkdir -p config logs
+    - name: Create logs directory
+      run: mkdir -p logs
 
     - name: Validate required secrets
       run: |
@@ -66,9 +66,9 @@ jobs:
     - name: Create portfolio configuration
       run: |
         if [ -n "${{ secrets.PORTFOLIO_JSON }}" ]; then
-          printf '%s\n' "${{ secrets.PORTFOLIO_JSON }}" > config/portfolio.json
+          printf '%s\n' "${{ secrets.PORTFOLIO_JSON }}" > config.json
         else
-          cat > config/portfolio.json << 'EOF'
+          cat > config.json << 'EOF'
 {
   "stocks": [
     {"symbol": "AAPL", "weight": 0.4},
@@ -85,7 +85,7 @@ EOF
 import json
 from pathlib import Path
 
-config_path = Path("config/portfolio.json")
+config_path = Path("config.json")
 data = json.loads(config_path.read_text())
 email = "${{ secrets.TO_EMAIL }}"
 if email:
@@ -102,16 +102,16 @@ PY
         RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
         FROM_EMAIL=${{ secrets.FROM_EMAIL }}
         TO_EMAIL=${{ secrets.TO_EMAIL }}
-        PORTFOLIO_CONFIG_PATH=config/portfolio.json
+        PORTFOLIO_CONFIG_PATH=config.json
         LOG_LEVEL=${{ github.event.inputs.log_level || 'INFO' }}
         EOF
 
     - name: Run daily digest
       run: |
         if [[ "${{ github.event.inputs.test_mode }}" == "true" ]]; then
-          python main.py --dry-run --config config/portfolio.json --log-level "${{ github.event.inputs.log_level || 'INFO' }}"
+          python main.py --dry-run --config config.json --log-level "${{ github.event.inputs.log_level || 'INFO' }}"
         else
-          python main.py --config config/portfolio.json --log-level "${{ github.event.inputs.log_level || 'INFO' }}"
+          python main.py --config config.json --log-level "${{ github.event.inputs.log_level || 'INFO' }}"
         fi
 
     - name: Upload logs
