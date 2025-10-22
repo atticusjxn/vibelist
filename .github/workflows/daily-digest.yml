@@ -10,17 +10,10 @@ on:
         description: 'Run in test mode (no email sent)'
         required: false
         default: 'false'
-        type: boolean
       log_level:
         description: 'Log level'
         required: false
         default: 'INFO'
-        type: choice
-        options:
-          - DEBUG
-          - INFO
-          - WARNING
-          - ERROR
 
 jobs:
   daily-digest:
