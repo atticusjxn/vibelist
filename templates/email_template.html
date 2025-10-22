@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeList Daily Portfolio Digest</title>
+    <style>
+        /* Retro 80s terminal styling */
+        @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* CRT monitor effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%,
+                rgba(0, 0, 0, 0.25) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #0f0f0f;
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #00ff41;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 32px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+            text-shadow: 0 0 10px #00ff41;
+            animation: flicker 2s infinite alternate;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            margin: 10px 0 0 0;
+            opacity: 0.8;
+        }
+
+        .datetime {
+            text-align: center;
+            font-size: 16px;
+            opacity: 0.7;
+            margin-bottom: 30px;
+        }
+
+        .market-summary {
+            background: #1a1a1a;
+            border: 1px solid #00ff41;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #00ff41;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            color: #ffff00;
+        }
+
+        .portfolio-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+
+        .portfolio-table th,
+        .portfolio-table td {
+            border: 1px solid #00ff41;
+            padding: 12px 8px;
+            text-align: left;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+        }
+
+        .portfolio-table th {
+            background: #1a1a1a;
+            color: #ffff00;
+            text-transform: uppercase;
+            font-weight: normal;
+        }
+
+        .portfolio-table tr:nth-child(even) {
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        .symbol {
+            font-weight: bold;
+            color: #00ffff;
+        }
+
+        .price {
+            color: #ffffff;
+        }
+
+        .positive {
+            color: #00ff41;
+        }
+
+        .negative {
+            color: #ff4141;
+        }
+
+        .neutral {
+            color: #ffff00;
+        }
+
+        .recommendation-buy {
+            background: rgba(0, 255, 65, 0.2);
+            color: #00ff41;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .recommendation-sell {
+            background: rgba(255, 65, 65, 0.2);
+            color: #ff4141;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .recommendation-hold {
+            background: rgba(255, 255, 0, 0.1);
+            color: #ffff00;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .insights {
+            background: #1a1a1a;
+            border: 1px solid #00ff41;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .insight-item {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .insight-item::before {
+            content: ">";
+            position: absolute;
+            left: 0;
+            color: #ffff00;
+        }
+
+        .reasoning {
+            font-size: 12px;
+            opacity: 0.8;
+            font-style: italic;
+            max-width: 200px;
+        }
+
+        .footer {
+            border-top: 2px solid #00ff41;
+            padding-top: 20px;
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        .terminal-prompt {
+            color: #00ff41;
+        }
+
+        .terminal-cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .score-bar {
+            width: 100%;
+            height: 8px;
+            background: #1a1a1a;
+            border: 1px solid #00ff41;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .score-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .score-fill.positive {
+            background: linear-gradient(90deg, #00ff41, #00ffff);
+        }
+
+        .score-fill.negative {
+            background: linear-gradient(90deg, #ff4141, #ff8800);
+        }
+
+        .score-fill.neutral {
+            background: linear-gradient(90deg, #ffff00, #ffff88);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">[ VIBELIST ]</h1>
+            <div class="subtitle">DAILY PORTFOLIO DIGEST</div>
+        </div>
+
+        <!-- Date/Time -->
+        <div class="datetime">
+            <span class="terminal-prompt">SYSTEM TIME:</span> {{ date_time }}
+        </div>
+
+        <!-- Market Summary -->
+        <div class="market-summary">
+            <div class="section-title">> MARKET ANALYSIS</div>
+            <p>{{ portfolio_analysis.market_summary }}</p>
+            <p><strong>Portfolio Score:</strong> {{ "%.3f"|format(portfolio_analysis.portfolio_score) }}</p>
+            <p><strong>Overall Sentiment:</strong> {{ "%.3f"|format(portfolio_analysis.overall_sentiment) }}</p>
+        </div>
+
+        <!-- Main Portfolio Table -->
+        <table class="portfolio-table">
+            <thead>
+                <tr>
+                    <th>SYMBOL</th>
+                    <th>PRICE</th>
+                    <th>CHANGE</th>
+                    <th>WEIGHT</th>
+                    <th>SENTIMENT</th>
+                    <th>RECOMMENDATION</th>
+                    <th>REASONING</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for symbol, analysis in portfolio_analysis.stock_analyses.items() %}
+                <tr>
+                    <td class="symbol">{{ analysis.symbol }}</td>
+                    <td class="price">${{ "%.2f"|format(analysis.stock_info.current_price) }}</td>
+                    <td class="{{ 'positive' if analysis.stock_info.change_percent > 0 else 'negative' if analysis.stock_info.change_percent < 0 else 'neutral' }}">
+                        {{ "%+.2f"|format(analysis.stock_info.change_percent) }}%
+                    </td>
+                    <td>{{ "%.1f"|format(analysis.portfolio_weight * 100) }}%</td>
+                    <td class="{{ 'positive' if analysis.sentiment_score.overall_sentiment > 0.2 else 'negative' if analysis.sentiment_score.overall_sentiment < -0.2 else 'neutral' }}">
+                        {{ "%.2f"|format(analysis.sentiment_score.overall_sentiment) }}
+                    </td>
+                    <td class="recommendation-{{ analysis.recommendation.lower() }}">
+                        {{ analysis.recommendation }}
+                    </td>
+                    <td class="reasoning">{{ analysis.reasoning }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Key Insights -->
+        <div class="insights">
+            <div class="section-title">> PORTFOLIO INSIGHTS</div>
+            {% for insight in portfolio_analysis.key_insights %}
+            <div class="insight-item">{{ insight }}</div>
+            {% endfor %}
+
+            {% if portfolio_analysis.top_performers %}
+            <div style="margin-top: 15px;">
+                <strong>Top Performers:</strong> {{ portfolio_analysis.top_performers | join(', ') }}
+            </div>
+            {% endif %}
+
+            {% if portfolio_analysis.underperformers %}
+            <div>
+                <strong>Watch List:</strong> {{ portfolio_analysis.underperformers | join(', ') }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="terminal-prompt">
+                VIBELIST SYSTEM v1.0 <span class="terminal-cursor">_</span>
+            </div>
+            <div style="margin-top: 10px; font-size: 12px;">
+                Powered by Grok AI & Yahoo Finance | Do not reply to this email
+            </div>
+        </div>
+    </div>
+</body>
+</html>

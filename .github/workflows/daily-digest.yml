@@ -1,0 +1,107 @@
+name: VibeList Daily Digest
+
+on:
+  schedule:
+    # Run daily at 4:30 PM EST (9:30 PM UTC) - after market close
+    - cron: '30 21 * * 1-5'  # Monday-Friday at 9:30 PM UTC
+  workflow_dispatch:  # Allow manual triggering
+    inputs:
+      test_mode:
+        description: 'Run in test mode (no email sent)'
+        required: false
+        default: 'false'
+        type: boolean
+      log_level:
+        description: 'Log level'
+        required: false
+        default: 'INFO'
+        type: choice
+        options:
+          - DEBUG
+          - INFO
+          - WARNING
+          - ERROR
+
+jobs:
+  daily-digest:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Create config directory
+      run: mkdir -p config logs
+
+    - name: Create portfolio configuration
+      run: |
+        cat > config/portfolio.json << EOF
+        {
+          "stocks": [
+            {"symbol": "AAPL", "weight": 0.4},
+            {"symbol": "TSLA", "weight": 0.3},
+            {"symbol": "NVDA", "weight": 0.3}
+          ],
+          "email": "${{ secrets.TO_EMAIL }}"
+        }
+        EOF
+
+    - name: Create environment file
+      run: |
+        cat > .env << EOF
+        GROK_API_KEY=${{ secrets.GROK_API_KEY }}
+        RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+        FROM_EMAIL=${{ secrets.FROM_EMAIL }}
+        TO_EMAIL=${{ secrets.TO_EMAIL }}
+        PORTFOLIO_CONFIG_PATH=config/portfolio.json
+        LOG_LEVEL=${{ github.event.inputs.log_level || 'INFO' }}
+        EOF
+
+    - name: Run daily digest
+      run: |
+        if [[ "${{ github.event.inputs.test_mode }}" == "true" ]]; then
+          python main.py --dry-run --config config/portfolio.json --log-level "${{ github.event.inputs.log_level || 'INFO' }}"
+        else
+          python main.py --config config/portfolio.json --log-level "${{ github.event.inputs.log_level || 'INFO' }}"
+        fi
+
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: digest-logs-${{ github.run_number }}
+        path: logs/
+        retention-days: 30
+
+    - name: Upload test email (if dry run)
+      if: github.event.inputs.test_mode == 'true'
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-email-${{ github.run_number }}
+        path: logs/test_digest_*.html
+        retention-days: 7
+
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "VibeList daily digest failed!" >&2
+        echo "Check the logs for details." >&2
+        # You could add additional notification logic here (email, Slack, etc.)
