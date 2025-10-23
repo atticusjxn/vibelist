@@ -5,195 +5,400 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VibeList Daily Portfolio Digest</title>
     <style>
-        /* Clean light theme styling */
+        /* Retro Terminal Theme with Better Accessibility */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Share+Tech+Mono&display=swap');
 
         body {
-            background: #f5f7fb;
-            color: #1f2933;
+            background: #0d1117;
+            color: #c9d1d9;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 16px;
             line-height: 1.5;
             margin: 0;
             padding: 20px;
-            position: relative;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 650px;
             margin: 0 auto;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: #161b22;
+            border: 2px solid #30363d;
             border-radius: 8px;
-            padding: 20px;
-            position: relative;
-            z-index: 2;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            padding: 24px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
         }
 
         .header {
             text-align: center;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 2px solid #30363d;
             padding-bottom: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #0d1117 0%, #1c2128 100%);
+            padding: 20px;
+            border-radius: 6px;
         }
 
         .title {
-            font-size: 30px;
-            letter-spacing: 1px;
-            margin: 0 0 4px 0;
-            color: #0f172a;
-            font-weight: 700;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 32px;
+            letter-spacing: 4px;
+            margin: 0;
+            color: #00ff41;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
         }
 
         .subtitle {
-            font-size: 18px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
             margin: 8px 0 0 0;
-            color: #475569;
+            color: #8b949e;
+            letter-spacing: 2px;
         }
 
         .datetime {
             text-align: center;
-            font-size: 15px;
-            color: #64748b;
-            margin-bottom: 30px;
-        }
-
-        .market-summary {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            padding: 15px;
-            margin-bottom: 25px;
-            border-radius: 4px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 2px solid #10b981;
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-            color: #0f172a;
-            font-weight: 600;
-        }
-
-        .portfolio-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 25px;
-        }
-
-        .portfolio-table th,
-        .portfolio-table td {
-            border: 1px solid #e2e8f0;
-            padding: 12px 10px;
-            text-align: left;
             font-family: 'Share Tech Mono', monospace;
             font-size: 13px;
-        }
-
-        .portfolio-table th {
-            background: #0f172a;
-            color: #f8fafc;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .portfolio-table tr:nth-child(even) {
-            background: #f9fafb;
-        }
-
-        .symbol {
-            font-weight: bold;
-            color: #0ea5e9;
-        }
-
-        .price {
-            color: #0f172a;
-        }
-
-        .positive {
-            color: #047857;
-        }
-
-        .negative {
-            color: #dc2626;
-        }
-
-        .neutral {
-            color: #b45309;
-        }
-
-        .recommendation-buy {
-            background: #dcfce7;
-            color: #065f46;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .recommendation-sell {
-            background: #fee2e2;
-            color: #b91c1c;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .recommendation-hold {
-            background: #fef9c3;
-            color: #854d0e;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .insights {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 15px;
-            margin-bottom: 25px;
+            color: #ffb000;
+            margin-bottom: 24px;
+            padding: 8px;
+            background: #0d1117;
             border-radius: 4px;
-        }
-
-        .insight-item {
-            margin-bottom: 8px;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .insight-item::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: #10b981;
-        }
-
-        .reasoning {
-            font-size: 12px;
-            color: #475569;
-            font-family: 'Inter', sans-serif;
-            max-width: 220px;
-        }
-
-        .footer {
-            border-top: 1px solid #e2e8f0;
-            padding-top: 20px;
-            margin-top: 30px;
-            text-align: center;
-            font-size: 14px;
-            color: #94a3b8;
         }
 
         .terminal-prompt {
             color: #00ff41;
         }
 
-        .terminal-cursor {
-            animation: blink 1s infinite;
+        /* Quick Summary Box */
+        .quick-summary {
+            background: #0d1117;
+            border: 2px solid #00ff41;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 24px;
         }
 
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+        .quick-summary-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            color: #00ff41;
+            margin: 0 0 12px 0;
+            letter-spacing: 2px;
+        }
+
+        .summary-stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .stat-badge {
+            font-family: 'Share Tech Mono', monospace;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .badge-buy {
+            background: #16a34a;
+            color: #ffffff;
+        }
+
+        .badge-hold {
+            background: #f59e0b;
+            color: #000000;
+        }
+
+        .badge-sell {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .portfolio-score {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 15px;
+            color: #c9d1d9;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        /* Stock Cards - Mobile Friendly */
+        .stock-card {
+            background: #0d1117;
+            border-left: 5px solid #30363d;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .stock-card:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+
+        .stock-card.rec-buy {
+            border-left-color: #16a34a;
+            background: linear-gradient(90deg, rgba(22, 163, 74, 0.1) 0%, #0d1117 100%);
+        }
+
+        .stock-card.rec-hold {
+            border-left-color: #f59e0b;
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.1) 0%, #0d1117 100%);
+        }
+
+        .stock-card.rec-sell {
+            border-left-color: #dc2626;
+            background: linear-gradient(90deg, rgba(220, 38, 38, 0.1) 0%, #0d1117 100%);
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+
+        .stock-symbol {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .stock-recommendation {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 6px 16px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .rec-buy-badge {
+            background: #16a34a;
+            color: #ffffff;
+        }
+
+        .rec-hold-badge {
+            background: #f59e0b;
+            color: #000000;
+        }
+
+        .rec-sell-badge {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .stock-metrics {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .metric {
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .stock-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .price-change {
+            font-size: 18px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .positive {
+            color: #22c55e;
+        }
+
+        .positive::before {
+            content: "↑ ";
+        }
+
+        .negative {
+            color: #ef4444;
+        }
+
+        .negative::before {
+            content: "↓ ";
+        }
+
+        .neutral {
+            color: #f59e0b;
+        }
+
+        .neutral::before {
+            content: "→ ";
+        }
+
+        .stock-details {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #8b949e;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .detail-item {
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .detail-label {
+            color: #6e7681;
+        }
+
+        .detail-value {
+            color: #c9d1d9;
+            font-weight: 600;
+        }
+
+        .stock-reasoning {
+            font-size: 14px;
+            color: #8b949e;
+            line-height: 1.6;
+            padding: 12px;
+            background: #161b22;
+            border-radius: 4px;
+            border-left: 3px solid #30363d;
+        }
+
+        .tweet-quote {
+            margin-top: 12px;
+            padding: 12px;
+            background: #0d1117;
+            border-left: 3px solid #00d4ff;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #c9d1d9;
+            font-style: italic;
+            transition: all 0.2s ease;
+        }
+
+        .tweet-quote a {
+            color: #c9d1d9;
+            text-decoration: none;
+            display: block;
+        }
+
+        .tweet-quote a:hover {
+            color: #00d4ff;
+        }
+
+        .tweet-quote:hover {
+            background: #161b22;
+            border-left-color: #00ff41;
+        }
+
+        .tweet-quote::before {
+            content: "𝕏 ";
+            color: #00d4ff;
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        .tweet-meta {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #6e7681;
+            font-style: normal;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .tweet-author {
+            color: #00d4ff;
+        }
+
+        .section-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00ff41;
+            margin: 32px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        .section-title::before {
+            content: "> ";
+            color: #ffb000;
+        }
+
+        /* Portfolio Insights */
+        .insights {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 6px;
+        }
+
+        .insight-item {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+
+        .insight-item::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #00ff41;
+            font-weight: bold;
+        }
+
+        .performers {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #30363d;
+        }
+
+        .performer-label {
+            font-weight: 600;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .performer-value {
+            color: #c9d1d9;
+            margin-left: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 2px solid #30363d;
+            padding-top: 20px;
+            margin-top: 32px;
+            text-align: center;
+        }
+
+        .terminal-cursor {
+            animation: blink 1s infinite;
         }
 
         @keyframes blink {
@@ -201,31 +406,72 @@
             51%, 100% { opacity: 0; }
         }
 
-        .score-bar {
-            width: 100%;
-            height: 8px;
-            background: #1a1a1a;
-            border: 1px solid #00ff41;
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
+        .footer-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: #6e7681;
+            margin-top: 8px;
         }
 
-        .score-fill {
-            height: 100%;
-            transition: width 0.3s ease;
+        .system-version {
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ff41;
+            font-size: 13px;
         }
 
-        .score-fill.positive {
-            background: linear-gradient(90deg, #00ff41, #00ffff);
-        }
+        /* Mobile Optimization */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
 
-        .score-fill.negative {
-            background: linear-gradient(90deg, #ff4141, #ff8800);
-        }
+            .container {
+                padding: 16px;
+            }
 
-        .score-fill.neutral {
-            background: linear-gradient(90deg, #ffff00, #ffff88);
+            .title {
+                font-size: 24px;
+                letter-spacing: 2px;
+            }
+
+            .stock-header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .stock-symbol {
+                font-size: 20px;
+            }
+
+            .stock-recommendation {
+                font-size: 14px;
+                padding: 4px 12px;
+            }
+
+            .stock-metrics {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .summary-stats {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .stat-badge {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .quick-summary {
+                padding: 12px;
+            }
+
+            .quick-summary-title {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -242,74 +488,130 @@
             <span class="terminal-prompt">SYSTEM TIME:</span> {{ date_time }}
         </div>
 
-        <!-- Market Summary -->
-        <div class="market-summary">
-            <div class="section-title">> MARKET ANALYSIS</div>
-            <p>{{ portfolio_analysis.market_summary }}</p>
-            <p><strong>Portfolio Score:</strong> {{ "%.3f"|format(portfolio_analysis.portfolio_score) }}</p>
-            <p><strong>Overall Sentiment:</strong> {{ "%.3f"|format(portfolio_analysis.overall_sentiment) }}</p>
+        <!-- Quick Summary Box -->
+        <div class="quick-summary">
+            <div class="quick-summary-title">TL;DR - TODAY'S OVERVIEW</div>
+            <div class="summary-stats">
+                {% set buy_count = portfolio_analysis.stock_analyses.values() | selectattr('recommendation', 'equalto', 'BUY') | list | length %}
+                {% set hold_count = portfolio_analysis.stock_analyses.values() | selectattr('recommendation', 'equalto', 'HOLD') | list | length %}
+                {% set sell_count = portfolio_analysis.stock_analyses.values() | selectattr('recommendation', 'equalto', 'SELL') | list | length %}
+
+                {% if buy_count > 0 %}
+                <div class="stat-badge badge-buy">{{ buy_count }} BUY</div>
+                {% endif %}
+                {% if hold_count > 0 %}
+                <div class="stat-badge badge-hold">{{ hold_count }} HOLD</div>
+                {% endif %}
+                {% if sell_count > 0 %}
+                <div class="stat-badge badge-sell">{{ sell_count }} SELL</div>
+                {% endif %}
+            </div>
+            <div class="portfolio-score">
+                Portfolio Score: <strong>{{ "%+.3f"|format(portfolio_analysis.portfolio_score) }}</strong> |
+                Sentiment: <strong>{{ "%.3f"|format(portfolio_analysis.overall_sentiment) }}</strong>
+            </div>
         </div>
 
-        <!-- Main Portfolio Table -->
-        <table class="portfolio-table">
-            <thead>
-                <tr>
-                    <th>SYMBOL</th>
-                    <th>PRICE</th>
-                    <th>CHANGE</th>
-                    <th>WEIGHT</th>
-                    <th>SENTIMENT</th>
-                    <th>RECOMMENDATION</th>
-                    <th>REASONING</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for symbol, analysis in portfolio_analysis.stock_analyses.items() %}
-                <tr>
-                    <td class="symbol">{{ analysis.symbol }}</td>
-                    <td class="price">${{ "%.2f"|format(analysis.stock_info.current_price) }}</td>
-                    <td class="{{ 'positive' if analysis.stock_info.change_percent > 0 else 'negative' if analysis.stock_info.change_percent < 0 else 'neutral' }}">
-                        {{ "%+.2f"|format(analysis.stock_info.change_percent) }}%
-                    </td>
-                    <td>{{ "%.1f"|format(analysis.portfolio_weight * 100) }}%</td>
-                    <td class="{{ 'positive' if analysis.sentiment_score.overall_sentiment > 0.2 else 'negative' if analysis.sentiment_score.overall_sentiment < -0.2 else 'neutral' }}">
-                        {{ "%.2f"|format(analysis.sentiment_score.overall_sentiment) }}
-                    </td>
-                    <td class="recommendation-{{ analysis.recommendation.lower() }}">
-                        {{ analysis.recommendation }}
-                    </td>
-                    <td class="reasoning">{{ analysis.reasoning }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <!-- Market Summary -->
+        <div class="section-title">Market Analysis</div>
+        <div class="insights" style="margin-top: 16px;">
+            <p style="margin: 0; color: #c9d1d9;">{{ portfolio_analysis.market_summary }}</p>
+        </div>
 
-        <!-- Key Insights -->
+        <!-- Stock Cards -->
+        <div class="section-title">Your Portfolio</div>
+        {% for symbol, analysis in portfolio_analysis.stock_analyses.items() %}
+        <div class="stock-card rec-{{ analysis.recommendation.lower() }}">
+            <!-- Stock Header: Symbol and Recommendation -->
+            <div class="stock-header">
+                <div class="stock-symbol">{{ analysis.symbol }}</div>
+                <div class="stock-recommendation rec-{{ analysis.recommendation.lower() }}-badge">
+                    {{ analysis.recommendation }}
+                </div>
+            </div>
+
+            <!-- Stock Metrics: Price and Change -->
+            <div class="stock-metrics">
+                <div class="metric">
+                    <span class="stock-price">${{ "%.2f"|format(analysis.stock_info.current_price) }}</span>
+                    <span class="price-change {{ 'positive' if analysis.stock_info.change_percent > 0 else 'negative' if analysis.stock_info.change_percent < 0 else 'neutral' }}">
+                        {{ "%+.2f"|format(analysis.stock_info.change_percent) }}%
+                    </span>
+                </div>
+            </div>
+
+            <!-- Stock Details: Weight and Sentiment -->
+            <div class="stock-details">
+                <div class="detail-item">
+                    <span class="detail-label">Weight:</span>
+                    <span class="detail-value">{{ "%.1f"|format(analysis.portfolio_weight * 100) }}%</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Sentiment:</span>
+                    <span class="detail-value {{ 'positive' if analysis.sentiment_score.overall_sentiment > 0.2 else 'negative' if analysis.sentiment_score.overall_sentiment < -0.2 else 'neutral' }}">
+                        {{ "%.2f"|format(analysis.sentiment_score.overall_sentiment) }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Reasoning -->
+            <div class="stock-reasoning">
+                {{ analysis.reasoning }}
+            </div>
+
+            <!-- Tweet Quote (if available) -->
+            {% if analysis.sentiment_score.top_quote %}
+            <div class="tweet-quote">
+                {% if analysis.sentiment_score.top_quote_username and analysis.sentiment_score.top_quote_tweet_id %}
+                <a href="https://x.com/{{ analysis.sentiment_score.top_quote_username }}/status/{{ analysis.sentiment_score.top_quote_tweet_id }}" target="_blank" rel="noopener noreferrer">
+                    {{ analysis.sentiment_score.top_quote }}
+                </a>
+                <div class="tweet-meta">
+                    <span class="tweet-author">@{{ analysis.sentiment_score.top_quote_username }}</span> · From {{ analysis.sentiment_score.post_count }} X posts analyzed · Click to view →
+                </div>
+                {% else %}
+                {{ analysis.sentiment_score.top_quote }}
+                <div class="tweet-meta">
+                    Representative quote from {{ analysis.sentiment_score.post_count }} X posts analyzed
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Portfolio Insights -->
+        <div class="section-title">Portfolio Insights</div>
         <div class="insights">
-            <div class="section-title">> PORTFOLIO INSIGHTS</div>
             {% for insight in portfolio_analysis.key_insights %}
             <div class="insight-item">{{ insight }}</div>
             {% endfor %}
 
-            {% if portfolio_analysis.top_performers %}
-            <div style="margin-top: 15px;">
-                <strong>Top Performers:</strong> {{ portfolio_analysis.top_performers | join(', ') }}
-            </div>
-            {% endif %}
+            {% if portfolio_analysis.top_performers or portfolio_analysis.underperformers %}
+            <div class="performers">
+                {% if portfolio_analysis.top_performers %}
+                <div style="margin-bottom: 8px;">
+                    <span class="performer-label">TOP PERFORMERS:</span>
+                    <span class="performer-value">{{ portfolio_analysis.top_performers | join(', ') }}</span>
+                </div>
+                {% endif %}
 
-            {% if portfolio_analysis.underperformers %}
-            <div>
-                <strong>Watch List:</strong> {{ portfolio_analysis.underperformers | join(', ') }}
+                {% if portfolio_analysis.underperformers %}
+                <div>
+                    <span class="performer-label">WATCH LIST:</span>
+                    <span class="performer-value">{{ portfolio_analysis.underperformers | join(', ') }}</span>
+                </div>
+                {% endif %}
             </div>
             {% endif %}
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <div class="terminal-prompt">
+            <div class="system-version">
                 VIBELIST SYSTEM v1.0 <span class="terminal-cursor">_</span>
             </div>
-            <div style="margin-top: 10px; font-size: 12px;">
+            <div class="footer-text">
                 Powered by xAI (Grok) & Yahoo Finance | Do not reply to this email
             </div>
         </div>

@@ -1,0 +1,41 @@
+{
+  "stocks": [
+    {
+      "symbol": "AVUV",
+      "weight": 0.0562
+    },
+    {
+      "symbol": "HOOD",
+      "weight": 0.08
+    },
+    {
+      "symbol": "PATH",
+      "weight": 0.1492
+    },
+    {
+      "symbol": "QQQM",
+      "weight": 0.32
+    },
+    {
+      "symbol": "SLNH",
+      "weight": 0.039
+    },
+    {
+      "symbol": "SMH",
+      "weight": 0.1658
+    },
+    {
+      "symbol": "SOUN",
+      "weight": 0.0834
+    },
+    {
+      "symbol": "TSM",
+      "weight": 0.0746
+    },
+    {
+      "symbol": "VOO",
+      "weight": 0.0318
+    }
+  ],
+  "email": "coorabellfirewood@gmail.com"
+}
