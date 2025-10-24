@@ -120,17 +120,17 @@ def adjust_for_sarcasm(vader_score: Dict[str, float], text: str) -> Dict[str, fl
         return score
 
 
-def analyze_sentiment(tweets: List[Any]) -> SentimentResult:
+def analyze_sentiment(posts: List[Any]) -> SentimentResult:
     """
-    Analyze sentiment of tweets using VADER
+    Analyze sentiment of posts (tweets or Reddit posts) using VADER
 
     Args:
-        tweets: List of TweetData objects from x_scraper
+        posts: List of TweetData or RedditPostData objects
 
     Returns:
         SentimentResult with aggregated sentiment analysis
     """
-    if not tweets or len(tweets) == 0:
+    if not posts or len(posts) == 0:
         logger.warning("No tweets to analyze, returning neutral sentiment")
         return SentimentResult(
             avg_sentiment=0.0,
@@ -145,21 +145,21 @@ def analyze_sentiment(tweets: List[Any]) -> SentimentResult:
     scores = []
     sarcasm_count = 0
 
-    tweet_scores = []  # Track individual scores for finding top tweets
+    post_scores = []  # Track individual scores for finding top posts
 
-    for tweet in tweets:
+    for post in posts:
         # Get VADER score
-        vader_score = analyzer.polarity_scores(tweet.text)
+        vader_score = analyzer.polarity_scores(post.text)
 
         # Adjust for sarcasm
-        adjusted_score = adjust_for_sarcasm(vader_score, tweet.text)
+        adjusted_score = adjust_for_sarcasm(vader_score, post.text)
 
         if adjusted_score['sarcasm_detected']:
             sarcasm_count += 1
 
         scores.append(adjusted_score['compound'])
-        tweet_scores.append({
-            'tweet': tweet,
+        post_scores.append({
+            'post': post,
             'compound': adjusted_score['compound'],
             'sarcasm': adjusted_score['sarcasm_detected']
         })
@@ -177,45 +177,49 @@ def analyze_sentiment(tweets: List[Any]) -> SentimentResult:
     neu_pct = (neu_count / len(scores)) * 100 if scores else 0.0
 
     # Determine confidence level
-    # High confidence: >20 tweets, <30% sarcasm detected
-    # Medium: 10-20 tweets OR 30-50% sarcasm
-    # Low: <10 tweets OR >50% sarcasm
-    sarcasm_pct = (sarcasm_count / len(tweets)) * 100 if tweets else 0
+    # High confidence: >20 posts, <30% sarcasm detected
+    # Medium: 10-20 posts OR 30-50% sarcasm
+    # Low: <10 posts OR >50% sarcasm
+    sarcasm_pct = (sarcasm_count / len(posts)) * 100 if posts else 0
 
-    if len(tweets) >= 20 and sarcasm_pct < 30:
+    if len(posts) >= 20 and sarcasm_pct < 30:
         confidence = "high"
-    elif len(tweets) >= 10 and sarcasm_pct < 50:
+    elif len(posts) >= 10 and sarcasm_pct < 50:
         confidence = "medium"
     else:
         confidence = "low"
 
     if sarcasm_pct > 30:
-        logger.warning(f"High sarcasm detected: {sarcasm_pct:.1f}% of tweets flagged, confidence downgraded")
+        logger.warning(f"High sarcasm detected: {sarcasm_pct:.1f}% of posts flagged, confidence downgraded")
 
-    # Find top positive and negative tweets
-    sorted_by_compound = sorted(tweet_scores, key=lambda x: x['compound'], reverse=True)
+    # Find top positive and negative posts
+    sorted_by_compound = sorted(post_scores, key=lambda x: x['compound'], reverse=True)
 
     top_positive = None
     if sorted_by_compound and sorted_by_compound[0]['compound'] > 0.2:
-        top_tweet = sorted_by_compound[0]
+        top_post = sorted_by_compound[0]
+        # Get username - works for both tweets (username) and Reddit posts (author)
+        username = getattr(top_post['post'], 'username', None) or getattr(top_post['post'], 'author', 'unknown')
         top_positive = {
-            'text': top_tweet['tweet'].text,
-            'username': top_tweet['tweet'].username,
-            'score': top_tweet['compound'],
-            'sarcasm': top_tweet['sarcasm']
+            'text': top_post['post'].text,
+            'username': username,
+            'score': top_post['compound'],
+            'sarcasm': top_post['sarcasm']
         }
 
     top_negative = None
     if sorted_by_compound and sorted_by_compound[-1]['compound'] < -0.2:
-        top_tweet = sorted_by_compound[-1]
+        top_post = sorted_by_compound[-1]
+        # Get username - works for both tweets (username) and Reddit posts (author)
+        username = getattr(top_post['post'], 'username', None) or getattr(top_post['post'], 'author', 'unknown')
         top_negative = {
-            'text': top_tweet['tweet'].text,
-            'username': top_tweet['tweet'].username,
-            'score': top_tweet['compound'],
-            'sarcasm': top_tweet['sarcasm']
+            'text': top_post['post'].text,
+            'username': username,
+            'score': top_post['compound'],
+            'sarcasm': top_post['sarcasm']
         }
 
-    logger.info(f"Sentiment analysis complete: {len(tweets)} tweets, avg={avg_sentiment:.3f}, pos={pos_pct:.1f}%, neg={neg_pct:.1f}%, confidence={confidence}")
+    logger.info(f"Sentiment analysis complete: {len(posts)} posts, avg={avg_sentiment:.3f}, pos={pos_pct:.1f}%, neg={neg_pct:.1f}%, confidence={confidence}")
 
     return SentimentResult(
         avg_sentiment=avg_sentiment,
@@ -223,7 +227,7 @@ def analyze_sentiment(tweets: List[Any]) -> SentimentResult:
         neg_pct=neg_pct,
         neu_pct=neu_pct,
         confidence=confidence,
-        tweets_analyzed=len(tweets),
+        tweets_analyzed=len(posts),
         top_positive=top_positive,
         top_negative=top_negative
     )

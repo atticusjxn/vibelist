@@ -9,9 +9,12 @@ resend>=1.0.0
 pandas>=2.2.0
 numpy>=1.26.0
 
-# X (Twitter) sentiment analysis
-ntscraper>=0.4.0
+# X (Twitter) scraping and sentiment analysis
+twikit>=2.0.0
 vaderSentiment>=3.3.2
+
+# Reddit scraping and sentiment analysis
+praw>=7.8.0
 
 # Logging and utilities
 colorlog>=6.8.0

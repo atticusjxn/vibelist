@@ -20,10 +20,13 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from vibelist.config import load_config
 from vibelist.stock_data import StockDataFetcher
-from vibelist.sentiment import XaiAPIClient
+from vibelist.sentiment import XaiAPIClient, build_sentiment_from_vader
 from vibelist.analyzer import RecommendationEngine
 from vibelist.email_generator import EmailGenerator
 from vibelist.email_sender import EmailSender
+from vibelist.x_scraper import fetch_tweets
+from vibelist.reddit_scraper import fetch_reddit_data
+from vibelist.sentiment_analyzer import analyze_sentiment
 
 
 PERSONAL_PORTFOLIO_HOLDINGS: List[Dict[str, Any]] = [
@@ -339,9 +342,50 @@ def generate_daily_digest(config_path: Optional[str] = None, test_mode: bool = F
 
         logger.info(f"Successfully fetched data for {len(stock_data)} stocks")
 
-        # Analyze sentiment
-        logger.info("Analyzing X sentiment...")
-        sentiment_data = xai_client.batch_analyze(stock_symbols)
+        # Analyze sentiment — source controlled via SENTIMENT_SOURCE env/config
+        sentiment_mode = getattr(config, 'sentiment_source', os.getenv('SENTIMENT_SOURCE', 'grok')).lower()
+        logger.info(f"Analyzing X sentiment using mode: {sentiment_mode}")
+
+        sentiment_data = {}
+        if sentiment_mode == 'vader':
+            # Use Twitter+Reddit+VADER for all symbols
+            for symbol in stock_symbols:
+                # Fetch from both sources
+                ft = fetch_tweets(symbol, count=30)
+                tweets = ft.get('tweets', [])
+
+                fr = fetch_reddit_data(symbol, count=30)
+                reddit_posts = fr.get('posts', [])
+
+                # Combine both sources
+                all_posts = tweets + reddit_posts
+                logger.info(f"${symbol}: Combined {len(tweets)} tweets + {len(reddit_posts)} Reddit posts = {len(all_posts)} total")
+
+                vader_res = analyze_sentiment(all_posts)
+                sentiment_data[symbol] = build_sentiment_from_vader(symbol, vader_res, all_posts)
+        elif sentiment_mode == 'auto':
+            # Prefer Twitter+Reddit+VADER if sufficient posts; otherwise Grok
+            for symbol in stock_symbols:
+                # Fetch from both sources
+                ft = fetch_tweets(symbol, count=30)
+                tweets = ft.get('tweets', [])
+
+                fr = fetch_reddit_data(symbol, count=30)
+                reddit_posts = fr.get('posts', [])
+
+                # Combine both sources
+                all_posts = tweets + reddit_posts
+                logger.info(f"${symbol}: Combined {len(tweets)} tweets + {len(reddit_posts)} Reddit posts = {len(all_posts)} total")
+
+                if len(all_posts) >= 5:
+                    vader_res = analyze_sentiment(all_posts)
+                    sentiment_data[symbol] = build_sentiment_from_vader(symbol, vader_res, all_posts)
+                else:
+                    logger.warning(f"Insufficient posts for ${symbol} ({len(all_posts)} total); using Grok fallback")
+                    sentiment_data[symbol] = xai_client.analyze_stock_sentiment(symbol, hours_back=48)
+        else:
+            # Default: Grok-only
+            sentiment_data = xai_client.batch_analyze(stock_symbols)
 
         if not sentiment_data:
             raise ValueError("No sentiment data could be analyzed")
